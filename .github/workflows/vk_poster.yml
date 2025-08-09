@@ -1,36 +1,29 @@
 name: VK Auto Poster
 
 on:
-  # Запуск по расписанию: каждый день в 9:00 по UTC (12:00 по МСК)
-  # Можете настроить время на свое усмотрение. Используйте crontab.guru для помощи
   schedule:
     - cron: '0 9 * * *'
-
-  # Позволяет запускать воркфлоу вручную из вкладки Actions на GitHub
   workflow_dispatch:
 
 jobs:
   post_to_vk:
     runs-on: ubuntu-latest
     steps:
-      # 1. Клонируем репозиторий, чтобы иметь доступ к файлам
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Устанавливаем Python нужной версии
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
-      # 3. Устанавливаем зависимости из requirements.txt
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      # 4. Запускаем наш основной скрипт
       - name: Run VK Poster Script
         env:
           VK_TOKEN: ${{ secrets.VK_TOKEN }}
           VK_GROUP_ID: ${{ secrets.VK_GROUP_ID }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # <-- ДОБАВЛЕНА ЭТА СТРОКА
         run: python post_to_vk.py
