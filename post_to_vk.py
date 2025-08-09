@@ -50,6 +50,14 @@ def upload_photo_to_vk(image_content):
         'v': VK_API_VERSION
     }
     upload_url_response = requests.get(f'{VK_API_URL}photos.getWallUploadServer', params=params).json()
+
+    # --- НОВАЯ ПРОВЕРКА НА ОШИБКУ ---
+    if 'error' in upload_url_response:
+        print("ОШИБКА от API VK при получении адреса для загрузки:")
+        print(upload_url_response['error'])
+        raise ValueError(f"VK API Error: {upload_url_response['error']['error_msg']}")
+    # --- КОНЕЦ ПРОВЕРКИ ---
+
     upload_url = upload_url_response['response']['upload_url']
 
     # 2. Загружаем фото на полученный адрес
@@ -67,6 +75,13 @@ def upload_photo_to_vk(image_content):
     }
     save_response = requests.post(f'{VK_API_URL}photos.saveWallUploadPhoto', data=save_params).json()
     
+    # --- ЕЩЕ ОДНА ПРОВЕРКА НА ОШИБКУ ---
+    if 'error' in save_response:
+        print("ОШИБКА от API VK при сохранении фото:")
+        print(save_response['error'])
+        raise ValueError(f"VK API Error: {save_response['error']['error_msg']}")
+    # --- КОНЕЦ ПРОВЕРКИ ---
+
     photo_data = save_response['response'][0]
     owner_id = photo_data['owner_id']
     photo_id = photo_data['id']
